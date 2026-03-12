@@ -1,12 +1,13 @@
-﻿using Microsoft.Agents.AI;
+using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Hosting;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
+using OpenAI.Chat;
 using WebUI.AgentHost.Utilities;
 
 namespace WebUI.StoryTellersAgents
 {
-    public static class DnDChat
+    public static class DnDGroupChat
     {
         public static IHostedAgentBuilder AddDnDGroup(this IHostApplicationBuilder builder, string connectionName)
         {
@@ -40,19 +41,16 @@ namespace WebUI.StoryTellersAgents
                 description: "A wise but cryptic magician who speaks in riddles.",
                 chatClientServiceKey: connectionName);
 
-
-            return builder.AddWorkflow("dnd-party-workflow",(sp,key)=> {
+            return builder.AddWorkflow("dnd-party-workflow", (sp, key) =>
+            {
+                
                 List<IHostedAgentBuilder> usedAgents = [mage, hero, thief];
                 var agents = usedAgents.Select(ab => sp.GetRequiredKeyedService<AIAgent>(ab.Name));
-                return AgentWorkflowBuilder
-                    .CreateGroupChatBuilderWith(agents =>
-                        new RoundRobinGroupChatManager(agents)
-                        {
-                            MaximumIterationCount = 5  // Maximum number of turns
-                        })
-                    .AddParticipants(agents)
-                    .Build();
-            }).AddAsAIAgent(name: "dnd-party-workflow");
+                return AgentWorkflowBuilder.CreateGroupChatBuilderWith(agents => new RoundRobinGroupChatManager(agents)
+                {
+                    MaximumIterationCount = 5 // Maximum number of turns in the conversation
+                }).AddParticipants(agents).WithName("dnd-party-workflow").Build();
+            }).AddAsAIAgent();
         }
     }
 }
