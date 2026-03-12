@@ -23,10 +23,10 @@ Participants will need a local Foundry runtime to run models on their machine.  
 2. **Start the service**
    ```powershell
    # verify installation
-   foundry-local --version
+   foundry --version
 
    # start the daemon (Windows example)
-   foundry-local start
+   foundry service start
    ```
    * On Linux/macOS use `sudo foundry-local start` if necessary.
    * Confirm the process is listening: `curl http://127.0.0.1:8576/v1/models` should return a 200.
