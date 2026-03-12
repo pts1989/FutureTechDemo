@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Solution Items/" />
+  <Project Path="ChatFrontend/ChatFrontend.csproj" />
+  <Project Path="DEMOMAF.AppHost/DEMOMAF.AppHost.csproj" Id="f5ab0f06-e6e9-4ae1-b8df-bc5157b534b3" />
+  <Project Path="DEMOMAF.ServiceDefaults/DEMOMAF.ServiceDefaults.csproj" />
+  <Project Path="WebUI/WebUI.csproj" />
+</Solution>
