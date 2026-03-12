@@ -30,6 +30,7 @@ builder.Services.AddAGUI();
 
 builder.AddStoryWriters("chat-model");
 builder.AddDnDGroup("chat-model");
+builder.AddWorldBuilder("chat-model");
 
 var ChatBot = builder.AddAIAgent("chatbot",
     instructions: "You are an amazing helpfull assistant that allways talks like a pirate",
