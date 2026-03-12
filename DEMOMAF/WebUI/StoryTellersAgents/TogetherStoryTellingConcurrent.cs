@@ -1,11 +1,11 @@
-﻿using Microsoft.Agents.AI;
+using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Hosting;
 using Microsoft.Agents.AI.Workflows;
 
 namespace WebUI.StoryTellersAgents
 {
 
-    public static class TogetherStoryTelling
+    public static class TogetherStoryTellingConcurrent
     {
         public static IHostedAgentBuilder AddStoryWriters(this IHostApplicationBuilder builder, string connectionName)
         {
