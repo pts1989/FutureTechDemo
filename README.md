@@ -18,7 +18,7 @@ The finished code for this workshop is available in this repository under `DEMOM
 Participants will need a local Foundry runtime to run models on their machine.  The official installer can be downloaded from the Microsoft Foundry site.  Follow these precise steps:
 
 1. **Download the binary**
-   * Visit the Foundry Local download page (https://aka.ms/foundry-local) and choose the package for your OS.
+   * Visit the Foundry Local download page ([https://aka.ms/foundry-local](https://learn.microsoft.com/en-us/azure/foundry-local/get-started?view=foundry-classic)) and choose the package for your OS.
    * Unpack the ZIP or run the MSI.
 2. **Start the service**
    ```powershell
