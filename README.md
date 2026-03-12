@@ -44,19 +44,20 @@ The workshop uses an [Aspire multiplatform solution](https://aka.ms/aspire) with
 
 1. **Create the solution container**
    ```powershell
-   dotnet new slnx -n WorkshopDemo
+   dotnet new sln -n WorkshopDemo
+   mkdir WorkshopDemo
    cd WorkshopDemo
    ```
 2. **Add the WebUI project**
    ```powershell
    dotnet new webapi -n WebUI
-   dotnet slnx add WebUI\WebUI.csproj
+   dotnet sln add WorkshopDemo\WebUI\WebUI.csproj 
    ```
 3. **Add support libraries**
    * Create a class library for shared settings or host defaults:
      ```powershell
      dotnet new classlib -n Workshop.ServiceDefaults
-     dotnet slnx add Workshop.ServiceDefaults\Workshop.ServiceDefaults.csproj
+     dotnet sln add WorkshopDemo\Workshop.ServiceDefaults\Workshop.ServiceDefaults.csproj
      ```
    * Add a second library for the ChatFrontend SPA if desired.
 4. **Reference projects**
