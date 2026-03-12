@@ -1,4 +1,4 @@
-﻿using WebUI.AgentHost.Utilities;
+using WebUI.AgentHost.Utilities;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
 using DEMOMAF;
@@ -104,7 +104,7 @@ public static class ChatClientExtensions
 
     private static async Task<ChatClientBuilder> AddKeyedOpenAIFoundryLocalClientAsync(this IHostApplicationBuilder builder, string connectionName, ChatClientConnectionInfo connectionInfo)
     {
-       // await FoundrySetup.StartChatFoundryService(connectionInfo.SelectedModel);
+        await FoundrySetup.StartChatFoundryService(connectionInfo.SelectedModel);
         return builder.AddKeyedOpenAIClient(connectionName, settings =>
         {
             settings.Endpoint = FoundrySetup.GetUri();
