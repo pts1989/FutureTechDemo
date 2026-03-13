@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.Agents.AI;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.AI.Evaluation;
+using Microsoft.Extensions.AI.Evaluation.Quality;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Agents.AI;
-using WebUI;
-using Xunit;
+
 
 namespace DEMOMAF.Tests;
 
@@ -23,22 +23,23 @@ public class AgentEvaluationTests : IClassFixture<WebApplicationFactory<Program>
         // Arrange
         var services = _factory.Services;
         var agent = services.GetRequiredKeyedService<AIAgent>("chatbot");
-        var chatClient = agent as IChatClient;
+        var chatClient = agent as ChatClientAgent;
         Assert.NotNull(chatClient);
 
         var conversation = new List<ChatMessage>
         {
-            new ChatMessage(ChatRole.User, "Hello, how are you?")
+            new ChatMessage(ChatRole.User, "Hello, Do you have sailing advice?")
         };
 
         // Act
-        var response = await chatClient.GetResponseAsync(conversation);
-
+        var response = await chatClient.RunAsync(conversation);
+        var chatreponse =new ChatResponse(response.Messages); // Convert to ChatResponse for evaluation
         // Assert
         Assert.NotNull(response);
         Assert.NotEmpty(response.Text);
-        Assert.Contains("pirate", response.Text.ToLower()); // Since it's pirate mode
+        var validator = new RelevanceEvaluator();
+        var validationResults = await validator.EvaluateAsync(conversation, chatreponse, new ChatConfiguration(chatClient.ChatClient));
+        var relevanceResult = validationResults.Metrics.First().Value;
+        Assert.False(relevanceResult!.Interpretation!.Failed);
     }
-
-    // TODO: Add evaluation tests using Microsoft.Extensions.AI.Evaluation once evaluators are available
 }

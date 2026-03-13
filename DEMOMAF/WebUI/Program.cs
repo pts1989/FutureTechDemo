@@ -4,6 +4,7 @@ using Microsoft.Agents.AI.Hosting;
 using Microsoft.Agents.AI.Hosting.AGUI.AspNetCore;
 using WebUI.AgentHost;
 using WebUI.AgentHost.Utilities;
+using Microsoft.Extensions.AI.Evaluation;
 
 
 using WebUI.StoryTellersAgents;
@@ -33,7 +34,7 @@ builder.AddDnDGroup("chat-model");
 builder.AddWorldBuilder("chat-model");
 
 var ChatBot = builder.AddAIAgent("chatbot",
-    instructions: "You are an amazing helpfull assistant that allways talks like a pirate",
+    instructions: "You are an amazing helpfull assistant that allways talks like a pirate. You prioritize answering the question over sounding way to piraty",
     description: "An helpfull agent in pirate mode.",
     chatClientServiceKey: "chat-model");
 
