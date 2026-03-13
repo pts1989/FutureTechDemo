@@ -1,0 +1,621 @@
+/* ============================================================
+   THE ARCANE PORTAL — D&D Theme
+   ============================================================ */
+
+:root {
+    --parchment:        #f5e6c8;
+    --parchment-dark:   #d9c89a;
+    --parchment-dim:    #9b8a6e;
+    --stone-darkest:    #0f0900;
+    --stone-dark:       #1a0e00;
+    --stone-medium:     #2c1a0e;
+    --stone-light:      #4a3728;
+    --gold:             #c9a227;
+    --gold-dark:        #8b6914;
+    --gold-dim:         #5a4510;
+    --blood-red:        #8b0000;
+    --emerald:          #2d6a4f;
+    --emerald-light:    #74c69d;
+    --sapphire:         #1a3a6b;
+    --sapphire-light:   #8ab4f8;
+    --amethyst:         #4a1a6b;
+    --amethyst-light:   #c084fc;
+    --ruby-light:       #ff8a8a;
+    --scroll-shadow:    0 4px 24px rgba(0,0,0,0.6);
+    --glow-gold:        0 0 20px rgba(201,162,39,0.35);
+    --font-heading:     'Cinzel', 'Palatino Linotype', serif;
+    --font-body:        'Crimson Text', Georgia, 'Times New Roman', serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    background-color: var(--stone-dark);
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    background-image:
+        radial-gradient(ellipse at top left,  rgba(44,26,14,0.8) 0%, transparent 60%),
+        radial-gradient(ellipse at bottom right, rgba(26,14,0,1) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238b6914' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+
+.portal-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.portal-header {
+    background: linear-gradient(180deg, #2c1a0e 0%, #1a0e00 100%);
+    border-bottom: 2px solid var(--gold-dark);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.5);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.portal-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.portal-title h1 {
+    font-family: var(--font-heading);
+    color: var(--gold);
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 25px rgba(201,162,39,0.4), 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.rune-deco {
+    color: var(--gold-dark);
+    font-size: 1.4rem;
+    opacity: 0.8;
+    text-shadow: 0 0 8px rgba(201,162,39,0.3);
+}
+
+.portal-nav {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    color: var(--parchment-dark);
+    text-decoration: none;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--gold-dim);
+    border-radius: 3px;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+}
+
+    .nav-link:hover { background: rgba(139,105,20,0.2); border-color: var(--gold-dark); color: var(--gold); }
+    .nav-link.active { background: rgba(201,162,39,0.15); border-color: var(--gold); color: var(--gold); }
+
+.portal-main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.portal-footer {
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid var(--gold-dim);
+    color: var(--gold-dim);
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+}
+
+/* ── Scroll / Panel ──────────────────────────────────────── */
+
+.scroll-panel {
+    background: linear-gradient(160deg, #351e10, #251508, #1a0e00);
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    padding: 1.5rem;
+    box-shadow: var(--scroll-shadow);
+    position: relative;
+}
+
+.scroll-panel.highlighted { border-color: var(--gold); box-shadow: var(--scroll-shadow), var(--glow-gold); }
+
+/* ── Page Headings ───────────────────────────────────────── */
+
+.page-title {
+    font-family: var(--font-heading);
+    color: var(--gold);
+    font-size: 1.9rem;
+    text-align: center;
+    margin: 0 0 0.4rem;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 25px rgba(201,162,39,0.3);
+}
+
+.page-subtitle {
+    text-align: center;
+    color: var(--parchment-dim);
+    font-style: italic;
+    font-size: 1.05rem;
+    margin: 0 0 1.5rem;
+}
+
+/* ── Agent Cards Grid ────────────────────────────────────── */
+
+.agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin: 1.25rem 0;
+}
+
+.agent-card {
+    background: linear-gradient(160deg, #2c1a0e, #1a0e00);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.agent-card.state-idle   { border-color: var(--gold-dim); }
+.agent-card.state-working {
+    border-color: var(--gold);
+    box-shadow: var(--glow-gold);
+    animation: pulse-glow 1.8s ease-in-out infinite;
+}
+.agent-card.state-done  { border-color: var(--emerald); box-shadow: 0 0 12px rgba(45,106,79,0.3); }
+.agent-card.state-error { border-color: var(--blood-red); box-shadow: 0 0 12px rgba(139,0,0,0.3); }
+
+@keyframes pulse-glow {
+    0%,100% { box-shadow: 0 0 10px rgba(201,162,39,0.2); }
+    50%      { box-shadow: 0 0 28px rgba(201,162,39,0.55); }
+}
+
+.agent-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.agent-identity { display: flex; align-items: center; gap: 0.6rem; }
+.agent-icon     { font-size: 1.8rem; line-height: 1; }
+
+.agent-name { font-family: var(--font-heading); color: var(--gold); font-size: 0.9rem; font-weight: 600; margin: 0; }
+.agent-role { color: var(--parchment-dim); font-size: 0.82rem; font-style: italic; margin: 0; }
+
+/* ── Status Badges ───────────────────────────────────────── */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.18rem 0.6rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-family: var(--font-heading);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.status-badge.idle    { background: rgba(74,55,40,0.4);  color: #7a6a58; border: 1px solid var(--stone-light); }
+.status-badge.working { background: rgba(201,162,39,0.1); color: var(--gold); border: 1px solid var(--gold-dark); animation: badge-shimmer 1.4s ease-in-out infinite; }
+.status-badge.done    { background: rgba(45,106,79,0.2);  color: var(--emerald-light); border: 1px solid var(--emerald); }
+.status-badge.error   { background: rgba(139,0,0,0.18);   color: var(--ruby-light); border: 1px solid var(--blood-red); }
+
+@keyframes badge-shimmer {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.status-badge.working .status-dot { animation: dot-blink 0.7s ease-in-out infinite; }
+
+@keyframes dot-blink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.1; }
+}
+
+/* ── Response Text ───────────────────────────────────────── */
+
+.agent-response {
+    background: rgba(245,230,200,0.04);
+    border: 1px solid rgba(201,162,39,0.15);
+    border-radius: 4px;
+    padding: 0.9rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--parchment);
+    min-height: 90px;
+    white-space: pre-wrap;
+    flex: 1;
+}
+
+.agent-response.placeholder {
+    color: var(--parchment-dim);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thinking-dots::after {
+    content: '…';
+    animation: thinking 1.4s steps(4, end) infinite;
+}
+
+@keyframes thinking {
+    0%  { content: '.'; }
+    33% { content: '..'; }
+    66% { content: '...'; }
+}
+
+/* ── Prompt Input ────────────────────────────────────────── */
+
+.prompt-section { margin: 1.25rem 0; }
+
+label.prompt-label {
+    display: block;
+    font-family: var(--font-heading);
+    color: var(--gold-dark);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+}
+
+.prompt-input {
+    width: 100%;
+    background: rgba(15,9,0,0.7);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+    resize: vertical;
+    min-height: 70px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.prompt-input:focus {
+    outline: none;
+    border-color: var(--gold-dark);
+    box-shadow: 0 0 10px rgba(201,162,39,0.15);
+}
+
+.prompt-input::placeholder { color: var(--stone-light); font-style: italic; }
+
+.cast-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none;
+    border-radius: 4px;
+    color: var(--stone-darkest);
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.65rem 1.8rem;
+    cursor: pointer;
+    margin-top: 0.65rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+}
+
+.cast-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(201,162,39,0.4);
+}
+
+.cast-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── Sequential Step Flow ────────────────────────────────── */
+
+.step-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 0.75rem 0 1.25rem;
+    flex-wrap: wrap;
+}
+
+.step-label {
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    color: var(--parchment-dim);
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--stone-light);
+    border-radius: 3px;
+    transition: all 0.3s;
+}
+
+.step-label.active  { color: var(--gold); border-color: var(--gold-dark); background: rgba(201,162,39,0.08); }
+.step-label.done    { color: var(--emerald-light); border-color: var(--emerald); background: rgba(45,106,79,0.1); }
+
+.step-arrow { color: var(--gold-dim); font-size: 1.2rem; }
+
+/* ── Final Assembled Scroll ──────────────────────────────── */
+
+.final-scroll {
+    background: linear-gradient(160deg, #3a2010, #2c1408, #1a0e00);
+    border: 2px solid var(--gold-dark);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 0 30px rgba(201,162,39,0.12);
+}
+
+.final-scroll h3 {
+    font-family: var(--font-heading);
+    color: var(--gold);
+    text-align: center;
+    margin: 0 0 1.25rem;
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+}
+
+.final-scroll h3::before,
+.final-scroll h3::after {
+    content: ' ✦ ';
+    opacity: 0.6;
+}
+
+.final-text {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--parchment);
+    white-space: pre-wrap;
+}
+
+/* ── Chat Thread (Party Chat) ────────────────────────────── */
+
+.chat-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.25rem 0;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+.chat-thread::-webkit-scrollbar       { width: 5px; }
+.chat-thread::-webkit-scrollbar-track { background: var(--stone-dark); }
+.chat-thread::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+.chat-bubble {
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    max-width: 88%;
+    animation: bubble-in 0.3s ease-out;
+}
+
+@keyframes bubble-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.chat-bubble.aragorn {
+    background: linear-gradient(135deg, rgba(29,44,29,0.9), rgba(14,26,14,0.9));
+    border: 1px solid rgba(74,124,78,0.5);
+    align-self: flex-start;
+}
+.chat-bubble.lila {
+    background: linear-gradient(135deg, rgba(44,20,20,0.9), rgba(26,10,10,0.9));
+    border: 1px solid rgba(124,74,74,0.5);
+    align-self: flex-end;
+}
+.chat-bubble.zoltan {
+    background: linear-gradient(135deg, rgba(20,20,44,0.9), rgba(10,10,26,0.9));
+    border: 1px solid rgba(74,74,124,0.5);
+    align-self: center;
+}
+
+.chat-bubble .speaker {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.04em;
+}
+
+.chat-bubble.aragorn .speaker { color: var(--emerald-light); }
+.chat-bubble.lila    .speaker { color: var(--ruby-light); }
+.chat-bubble.zoltan  .speaker { color: var(--sapphire-light); }
+
+.chat-bubble .message {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--parchment);
+}
+
+/* ── Character Row (active indicator in party chat) ─────── */
+
+.party-roster {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 0.75rem 0 1.25rem;
+    flex-wrap: wrap;
+}
+
+.roster-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--stone-light);
+    min-width: 100px;
+    transition: all 0.3s;
+    background: rgba(26,14,0,0.5);
+}
+
+.roster-card.active {
+    border-color: var(--gold);
+    background: rgba(201,162,39,0.08);
+    box-shadow: var(--glow-gold);
+    animation: pulse-glow 1.8s ease-in-out infinite;
+}
+
+.roster-icon  { font-size: 2rem; }
+.roster-name  { font-family: var(--font-heading); font-size: 0.78rem; color: var(--parchment-dim); text-align: center; }
+.roster-card.active .roster-name { color: var(--gold); }
+
+/* ── Home Page Hero ──────────────────────────────────────── */
+
+.hero-section {
+    text-align: center;
+    padding: 2.5rem 1rem;
+}
+
+.hero-title {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    color: var(--gold);
+    text-shadow: 0 0 40px rgba(201,162,39,0.4), 0 2px 6px rgba(0,0,0,0.9);
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.06em;
+}
+
+.hero-lore {
+    color: var(--parchment-dim);
+    font-style: italic;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+}
+
+.workflow-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.workflow-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.workflow-card .scroll-panel {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    height: 100%;
+}
+
+.workflow-card:hover .scroll-panel {
+    border-color: var(--gold-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(201,162,39,0.2);
+}
+
+.workflow-card-icon  { font-size: 3.2rem; display: block; margin-bottom: 0.75rem; }
+.workflow-card h3    { font-family: var(--font-heading); color: var(--gold); margin: 0 0 0.5rem; font-size: 1.15rem; letter-spacing: 0.05em; }
+.workflow-card p     { color: var(--parchment-dim); font-style: italic; margin: 0 0 0.75rem; font-size: 0.95rem; line-height: 1.55; }
+.workflow-card .card-badge-row { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.agent-chip { font-family: var(--font-heading); font-size: 0.72rem; padding: 0.15rem 0.55rem; border-radius: 3px; border: 1px solid var(--gold-dim); color: var(--parchment-dim); }
+
+/* ── Warning / Error Box ─────────────────────────────────── */
+
+.warning-scroll {
+    background: rgba(139,0,0,0.1);
+    border: 1px solid rgba(139,0,0,0.5);
+    border-radius: 6px;
+    padding: 0.9rem 1.25rem;
+    color: var(--ruby-light);
+    font-style: italic;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+
+.rune-divider {
+    text-align: center;
+    color: var(--gold-dim);
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    margin: 1.5rem 0;
+    opacity: 0.6;
+}
+
+/* ── Blazor error UI ─────────────────────────────────────── */
+
+#blazor-error-ui {
+    background: rgba(139,0,0,0.9);
+    bottom: 0;
+    box-shadow: 0 -1px 8px rgba(0,0,0,0.6);
+    display: none;
+    left: 0;
+    padding: 0.75rem 1.5rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    font-family: var(--font-heading);
+    color: var(--parchment);
+    font-size: 0.85rem;
+}
+
+#blazor-error-ui .dismiss { cursor: pointer; font-weight: bold; }
+
+.blazor-error-boundary { background: rgba(139,0,0,0.2); padding: 1rem; border-radius: 4px; color: var(--ruby-light); }
+.blazor-error-boundary::after { content: "An error has occurred."; }

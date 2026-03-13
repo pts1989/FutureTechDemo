@@ -1,0 +1,175 @@
+@page "/story-writers"
+@rendermode InteractiveServer
+@inject IServiceProvider Services
+@implements IAsyncDisposable
+
+<PageTitle>Story Conclave — The Arcane Portal</PageTitle>
+
+<h1 class="page-title">📚 Story Conclave</h1>
+<p class="page-subtitle">All three genre masters write simultaneously. Witness their craft unfold in real time.</p>
+
+<!-- prompt -->
+<div class="scroll-panel prompt-section">
+    <label class="prompt-label">✦ PROVIDE YOUR OPENING PREMISE:</label>
+    <textarea class="prompt-input"
+              @bind="_prompt"
+              placeholder="e.g. A lone astronaut discovers ancient ruins on a desolate moon that seem to be made of living bone…"
+              disabled="@_isRunning"></textarea>
+    <button class="cast-btn" @onclick="RunWorkflow" disabled="@(_isRunning || string.IsNullOrWhiteSpace(_prompt))">
+        @if (_isRunning) { <span>⏳ The quills are moving…</span> } else { <span>🖊️ Begin the Conclave</span> }
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="warning-scroll">⚠️ @_errorMessage</div>
+}
+
+<!-- concurrent agent cards -->
+<div class="agent-grid">
+    @foreach (var agent in _writers)
+    {
+        <div class="agent-card @CardClass(agent.Key)">
+            <div class="agent-header">
+                <div class="agent-identity">
+                    <span class="agent-icon">@agent.Value.Icon</span>
+                    <div>
+                        <p class="agent-name">@agent.Value.DisplayName</p>
+                        <p class="agent-role">@agent.Value.Genre</p>
+                    </div>
+                </div>
+                <span class="status-badge @_states[agent.Key].ToString().ToLower()">
+                    <span class="status-dot"></span>
+                    @StatusLabel(_states[agent.Key])
+                </span>
+            </div>
+            @if (!string.IsNullOrEmpty(_responses[agent.Key]))
+            {
+                <div class="agent-response">@_responses[agent.Key]</div>
+            }
+            else
+            {
+                <div class="agent-response placeholder">
+                    @if (_states[agent.Key] == AgentState.Working)
+                    {
+                        <span class="thinking-dots">Writing</span>
+                    }
+                    else
+                    {
+                        <span>Awaiting the call…</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private enum AgentState { Idle, Working, Done, Error }
+
+    private record WriterInfo(string Key, string DisplayName, string Icon, string Genre);
+
+    private readonly Dictionary<string, WriterInfo> _writers = new()
+    {
+        ["Fantasy_Expert"] = new("Fantasy_Expert", "Fantasy Expert", "📖", "Epic fantasy — ancient magic & grand destiny"),
+        ["Horror_Expert"]  = new("Horror_Expert",  "Horror Expert",  "💀", "Psychological horror — dread built from silence"),
+        ["SciFi_Expert"]   = new("SciFi_Expert",   "Sci-Fi Expert",  "🚀", "Hard sci-fi — cybernetic awe & alien scale"),
+    };
+
+    private readonly Dictionary<string, AgentState> _states = new()
+    {
+        ["Fantasy_Expert"] = AgentState.Idle, ["Horror_Expert"] = AgentState.Idle, ["SciFi_Expert"] = AgentState.Idle
+    };
+
+    private readonly Dictionary<string, string> _responses = new()
+    {
+        ["Fantasy_Expert"] = string.Empty, ["Horror_Expert"] = string.Empty, ["SciFi_Expert"] = string.Empty
+    };
+
+    private string _prompt = string.Empty;
+    private bool _isRunning;
+    private string _errorMessage = string.Empty;
+
+    private CancellationTokenSource? _cts;
+
+    private async Task RunWorkflow()
+    {
+        _isRunning = true;
+        _errorMessage = string.Empty;
+        _cts = new CancellationTokenSource();
+
+        foreach (var k in _states.Keys.ToList())  { _states[k] = AgentState.Working; _responses[k] = string.Empty; }
+        StateHasChanged();
+
+        var messages = new List<ChatMessage> { new(ChatRole.User, _prompt) };
+
+        try
+        {
+            // All three run concurrently; each updates the UI as it completes
+            await Task.WhenAll(
+                WriteAndUpdate("Fantasy_Expert", messages, _cts.Token),
+                WriteAndUpdate("Horror_Expert",  messages, _cts.Token),
+                WriteAndUpdate("SciFi_Expert",   messages, _cts.Token)
+            );
+        }
+        catch (OperationCanceledException)
+        {
+            _errorMessage = "The conclave was interrupted.";
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"The conclave failed: {ex.Message}";
+        }
+        finally
+        {
+            _isRunning = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task WriteAndUpdate(string key, List<ChatMessage> messages, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        try
+        {
+            var agent = Services.GetRequiredKeyedService<AIAgent>(key);
+            var response = await agent.RunAsync(messages);
+            await InvokeAsync(() =>
+            {
+                _responses[key] = response.Text ?? string.Empty;
+                _states[key] = AgentState.Done;
+                StateHasChanged();
+            });
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                _responses[key] = $"(error: {ex.Message})";
+                _states[key] = AgentState.Error;
+                StateHasChanged();
+            });
+        }
+    }
+
+    private string CardClass(string key) => $"state-{_states[key].ToString().ToLower()}";
+
+    private static string StatusLabel(AgentState s) => s switch
+    {
+        AgentState.Idle    => "Idle",
+        AgentState.Working => "Writing",
+        AgentState.Done    => "Done",
+        AgentState.Error   => "Error",
+        _                  => "?"
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_cts is not null)
+        {
+            await _cts.CancelAsync();
+            _cts.Dispose();
+        }
+    }
+}

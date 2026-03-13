@@ -1,0 +1,15 @@
+<Router AppAssembly="typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="typeof(Layout.MainLayout)">
+            <div class="scroll-panel" style="text-align:center;margin-top:3rem;">
+                <p class="page-subtitle">⚠️ This scroll has been lost to the ages.</p>
+                <a href="/" class="cast-btn">Return to the Portal</a>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

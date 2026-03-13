@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+
+<div class="portal-layout">
+    <header class="portal-header">
+        <div class="header-content">
+            <div class="portal-title">
+                <span class="rune-deco">᛭</span>
+                <h1>The Arcane Portal</h1>
+                <span class="rune-deco">᛭</span>
+            </div>
+            <nav class="portal-nav">
+                <NavLink href="/" class="nav-link" Match="NavLinkMatch.All">🏰 Hall of Lore</NavLink>
+                <NavLink href="/world-builder" class="nav-link">🌍 World Builder</NavLink>
+                <NavLink href="/party-chat" class="nav-link">⚔️ Party Council</NavLink>
+                <NavLink href="/story-writers" class="nav-link">📚 Story Conclave</NavLink>
+            </nav>
+        </div>
+    </header>
+
+    <main class="portal-main">
+        <article>
+            @Body
+        </article>
+    </main>
+
+    <footer class="portal-footer">
+        <p>✦ Forged with Ancient AI Magic ✦</p>
+    </footer>
+</div>

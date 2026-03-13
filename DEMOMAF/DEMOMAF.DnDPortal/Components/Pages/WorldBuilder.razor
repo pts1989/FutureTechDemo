@@ -1,0 +1,190 @@
+@page "/world-builder"
+@rendermode InteractiveServer
+@inject IServiceProvider Services
+
+<PageTitle>World Builder — The Arcane Portal</PageTitle>
+
+<h1 class="page-title">🌍 World Builder</h1>
+<p class="page-subtitle">Three master artisans craft your world in sequence.</p>
+
+<!-- step flow indicator -->
+<div class="step-flow">
+    <span class="step-label @StepClass("World_Builder")">🏔 World Builder</span>
+    <span class="step-arrow">→</span>
+    <span class="step-label @StepClass("Character_Creator")">🧙 Character Creator</span>
+    <span class="step-arrow">→</span>
+    <span class="step-label @StepClass("Plot_Generator")">⚡ Plot Generator</span>
+</div>
+
+<!-- prompt -->
+<div class="scroll-panel prompt-section">
+    <label class="prompt-label">✦ DESCRIBE YOUR WORLD:</label>
+    <textarea class="prompt-input"
+              @bind="_prompt"
+              placeholder="e.g. A floating jungle city where old magic powers ancient machines..."
+              disabled="@_isRunning"></textarea>
+    <button class="cast-btn" @onclick="RunWorkflow" disabled="@(_isRunning || string.IsNullOrWhiteSpace(_prompt))">
+        @if (_isRunning) { <span>⏳ Weaving the World…</span> } else { <span>✨ Conjure World</span> }
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="warning-scroll">⚠️ @_errorMessage</div>
+}
+
+<!-- agent cards -->
+<div class="agent-grid">
+    @foreach (var agent in _agents)
+    {
+        <div class="agent-card @CardClass(agent.Key)">
+            <div class="agent-header">
+                <div class="agent-identity">
+                    <span class="agent-icon">@agent.Value.Icon</span>
+                    <div>
+                        <p class="agent-name">@agent.Value.DisplayName</p>
+                        <p class="agent-role">@agent.Value.Role</p>
+                    </div>
+                </div>
+                <span class="status-badge @_states[agent.Key].ToString().ToLower()">
+                    <span class="status-dot"></span>
+                    @StatusLabel(_states[agent.Key])
+                </span>
+            </div>
+            @if (!string.IsNullOrEmpty(_responses[agent.Key]))
+            {
+                <div class="agent-response">@_responses[agent.Key]</div>
+            }
+            else
+            {
+                <div class="agent-response placeholder">
+                    @if (_states[agent.Key] == AgentState.Working)
+                    {
+                        <span class="thinking-dots">Crafting</span>
+                    }
+                    else
+                    {
+                        <span>Awaiting their turn…</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@if (_agents.Values.All(a => _states[a.Key] == AgentState.Done) && _agents.Count > 0)
+{
+    <div class="final-scroll">
+        <h3>The Complete Tale</h3>
+        <div class="final-text">
+            @foreach (var (key, info) in _agents)
+            {
+                if (!string.IsNullOrEmpty(_responses[key]))
+                {
+                    <p><strong style="font-family:var(--font-heading);color:var(--gold);font-size:0.85rem;">@info.DisplayName.ToUpperInvariant()</strong></p>
+                    <p>@_responses[key]</p>
+                    <br />
+                }
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private enum AgentState { Idle, Working, Done, Error }
+
+    private record AgentInfo(string Key, string DisplayName, string Icon, string Role);
+
+    private readonly Dictionary<string, AgentInfo> _agents = new()
+    {
+        ["World_Builder"]     = new("World_Builder",     "World Builder",     "🏔", "Sets the scene with vivid, sensory detail."),
+        ["Character_Creator"] = new("Character_Creator", "Character Creator", "🧙", "Introduces a memorable character into the world."),
+        ["Plot_Generator"]    = new("Plot_Generator",    "Plot Generator",    "⚡", "Sparks an unexpected conflict or turning point.")
+    };
+
+    private readonly Dictionary<string, AgentState> _states = new()
+    {
+        ["World_Builder"] = AgentState.Idle, ["Character_Creator"] = AgentState.Idle, ["Plot_Generator"] = AgentState.Idle
+    };
+
+    private readonly Dictionary<string, string> _responses = new()
+    {
+        ["World_Builder"] = string.Empty, ["Character_Creator"] = string.Empty, ["Plot_Generator"] = string.Empty
+    };
+
+    private string _prompt = string.Empty;
+    private bool _isRunning;
+    private string _errorMessage = string.Empty;
+
+    private async Task RunWorkflow()
+    {
+        _isRunning = true;
+        _errorMessage = string.Empty;
+        foreach (var k in _states.Keys.ToList()) { _states[k] = AgentState.Idle; _responses[k] = string.Empty; }
+
+        try
+        {
+            var history = new List<ChatMessage> { new(ChatRole.User, _prompt) };
+
+            // ── Step 1 ──────────────────────────────────────────────
+            await RunStep("World_Builder", history);
+            history.Add(new(ChatRole.Assistant, _responses["World_Builder"]));
+
+            // ── Step 2 ──────────────────────────────────────────────
+            await RunStep("Character_Creator", history);
+            history.Add(new(ChatRole.Assistant, _responses["Character_Creator"]));
+
+            // ── Step 3 ──────────────────────────────────────────────
+            await RunStep("Plot_Generator", history);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"The ritual failed: {ex.Message}";
+        }
+        finally
+        {
+            _isRunning = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RunStep(string agentKey, List<ChatMessage> history)
+    {
+        _states[agentKey] = AgentState.Working;
+        StateHasChanged();
+        try
+        {
+            var agent = Services.GetRequiredKeyedService<AIAgent>(agentKey);
+            var response = await agent.RunAsync(history);
+            _responses[agentKey] = response.Text ?? string.Empty;
+            _states[agentKey] = AgentState.Done;
+        }
+        catch (Exception ex)
+        {
+            _responses[agentKey] = $"(failed: {ex.Message})";
+            _states[agentKey] = AgentState.Error;
+            throw;
+        }
+        StateHasChanged();
+    }
+
+    // ── UI helpers ───────────────────────────────────────────
+
+    private string CardClass(string key) => $"state-{_states[key].ToString().ToLower()}";
+
+    private string StepClass(string key) => _states[key] switch
+    {
+        AgentState.Working => "active",
+        AgentState.Done    => "done",
+        _                  => string.Empty
+    };
+
+    private static string StatusLabel(AgentState s) => s switch
+    {
+        AgentState.Idle    => "Idle",
+        AgentState.Working => "Working",
+        AgentState.Done    => "Done",
+        AgentState.Error   => "Error",
+        _                  => "?"
+    };
+}

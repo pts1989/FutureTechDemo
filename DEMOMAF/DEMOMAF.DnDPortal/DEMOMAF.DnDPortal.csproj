@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <RootNamespace>DEMOMAF.DnDPortal</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DEMOMAF.ServiceDefaults\DEMOMAF.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\WebUI\WebUI.csproj" />
+  </ItemGroup>
+
+</Project>

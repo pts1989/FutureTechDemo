@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ChatFrontend\ChatFrontend.csproj" />
     <ProjectReference Include="..\WebUI\WebUI.csproj" />
+    <ProjectReference Include="..\DEMOMAF.DnDPortal\DEMOMAF.DnDPortal.csproj" />
   </ItemGroup>
 
 </Project>

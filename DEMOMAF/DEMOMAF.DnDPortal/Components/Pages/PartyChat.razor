@@ -1,0 +1,150 @@
+@page "/party-chat"
+@rendermode InteractiveServer
+@inject IServiceProvider Services
+@implements IAsyncDisposable
+
+<PageTitle>Party Council — The Arcane Portal</PageTitle>
+
+<h1 class="page-title">⚔️ Party Council</h1>
+<p class="page-subtitle">Present your dilemma. The party deliberates in turns.</p>
+
+<!-- roster with active indicator -->
+<div class="party-roster">
+    @foreach (var c in _characters)
+    {
+        <div class="roster-card @(c.Key == _activeAgent ? "active" : string.Empty)">
+            <span class="roster-icon">@c.Value.Icon</span>
+            <span class="roster-name">@c.Value.DisplayName</span>
+            @if (c.Key == _activeAgent)
+            {
+                <span class="status-badge working"><span class="status-dot"></span>Speaking</span>
+            }
+        </div>
+    }
+</div>
+
+<!-- prompt -->
+<div class="scroll-panel prompt-section">
+    <label class="prompt-label">✦ PRESENT YOUR DILEMMA:</label>
+    <textarea class="prompt-input"
+              @bind="_prompt"
+              placeholder="e.g. Our party stands at the entrance of an ancient dragon's lair — what do we do?"
+              disabled="@_isRunning"></textarea>
+    <button class="cast-btn" @onclick="RunWorkflow" disabled="@(_isRunning || string.IsNullOrWhiteSpace(_prompt))">
+        @if (_isRunning) { <span>⏳ The party is deliberating…</span> } else { <span>🗣️ Convene the Party</span> }
+    </button>
+    @if (_isRunning)
+    {
+        <div style="margin-top:0.5rem;color:var(--parchment-dim);font-style:italic;font-size:0.9rem;">
+            Round @_currentRound of @_totalRounds — @(_activeAgent.Replace("_", " ")) is speaking…
+        </div>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="warning-scroll">⚠️ @_errorMessage</div>
+}
+
+<!-- chat thread -->
+@if (_chatThread.Count > 0)
+{
+    <div class="chat-thread">
+        @foreach (var (speaker, message, cssClass) in _chatThread)
+        {
+            <div class="chat-bubble @cssClass">
+                <div class="speaker">@speaker</div>
+                <div class="message">@message</div>
+            </div>
+        }
+    </div>
+}
+else if (!_isRunning)
+{
+    <div class="scroll-panel" style="text-align:center;color:var(--parchment-dim);font-style:italic;padding:2rem;">
+        The council chamber awaits your summons…
+    </div>
+}
+
+@code {
+    private enum AgentState { Idle, Working, Done }
+
+    private record CharacterInfo(string Key, string DisplayName, string Icon, string CssClass);
+
+    private readonly Dictionary<string, CharacterInfo> _characters = new()
+    {
+        ["Aragorn_The_Hero"] = new("Aragorn_The_Hero", "Aragorn", "⚔️", "aragorn"),
+        ["Lila_The_Thief"]   = new("Lila_The_Thief",   "Lila",    "🗡️", "lila"),
+        ["Zoltan_The_Mage"]  = new("Zoltan_The_Mage",  "Zoltan",  "🔮", "zoltan"),
+    };
+
+    private readonly List<(string Speaker, string Message, string CssClass)> _chatThread = [];
+
+    private string _prompt = string.Empty;
+    private string _activeAgent = string.Empty;
+    private bool _isRunning;
+    private string _errorMessage = string.Empty;
+    private int _currentRound;
+    private readonly int _totalRounds = 2;   // 2 rounds × 3 agents = 6 turns
+
+    private CancellationTokenSource? _cts;
+
+    private async Task RunWorkflow()
+    {
+        _isRunning = true;
+        _errorMessage = string.Empty;
+        _chatThread.Clear();
+        _activeAgent = string.Empty;
+        _currentRound = 0;
+        _cts = new CancellationTokenSource();
+
+        try
+        {
+            var history = new List<ChatMessage> { new(ChatRole.User, _prompt) };
+
+            for (int round = 1; round <= _totalRounds; round++)
+            {
+                _currentRound = round;
+                foreach (var (key, info) in _characters)
+                {
+                    _cts.Token.ThrowIfCancellationRequested();
+                    _activeAgent = key;
+                    StateHasChanged();
+
+                    _cts.Token.ThrowIfCancellationRequested();
+                    var agent = Services.GetRequiredKeyedService<AIAgent>(key);
+                    var response = await agent.RunAsync(history);
+                    string text = response.Text ?? string.Empty;
+
+                    // Keep conversation history compact: only the last turn per agent
+                    history.Add(new(ChatRole.Assistant, $"[{info.DisplayName}]: {text}"));
+                    _chatThread.Add((info.DisplayName, text, info.CssClass));
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _errorMessage = "The council was dismissed.";
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"The council fell into chaos: {ex.Message}";
+        }
+        finally
+        {
+            _activeAgent = string.Empty;
+            _isRunning = false;
+            StateHasChanged();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_cts is not null)
+        {
+            await _cts.CancelAsync();
+            _cts.Dispose();
+        }
+    }
+}
